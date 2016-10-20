@@ -69,7 +69,10 @@ def YumInstall(vm):
 
 def AptInstall(vm):
   """Installs Hadoop on the VM."""
-  vm.InstallPackages('libsnappy1 libsnappy-dev')
+  libsnappy = 'libsnappy1'
+  if not vm.HasPackage(libsnappy):
+    libsnappy = 'libsnappy1v5'
+  vm.InstallPackages('%s libsnappy-dev' % libsnappy)
   _Install(vm)
 
 
