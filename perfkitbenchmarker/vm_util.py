@@ -287,10 +287,12 @@ def IssueCommand(cmd, force_info_log=False, suppress_warning=False,
     process = subprocess.Popen(cmd, env=env, shell=shell_value,
                                stdin=subprocess.PIPE, stdout=tf_out,
                                stderr=tf_err)
+    logging.info('Spawned cmd=%r pid=%d', full_cmd, process.pid)
 
     def _KillProcess():
       logging.error('IssueCommand timed out after %d seconds. '
-                    'Killing command "%s".', timeout, full_cmd)
+                    'Killing command "%s" pid=%d.', timeout, full_cmd,
+                    process.pid)
       process.kill()
 
     timer = threading.Timer(timeout, _KillProcess)
@@ -298,6 +300,10 @@ def IssueCommand(cmd, force_info_log=False, suppress_warning=False,
 
     try:
       process.wait()
+    except:
+      logging.exception('Error while waiting for cmd=%r pid=%d', full_cmd,
+                        process.pid)
+      raise
     finally:
       timer.cancel()
 
@@ -306,8 +312,8 @@ def IssueCommand(cmd, force_info_log=False, suppress_warning=False,
     tf_err.seek(0)
     stderr = tf_err.read().decode('ascii', 'ignore')
 
-  debug_text = ('Ran %s. Got return code (%s).\nSTDOUT: %s\nSTDERR: %s' %
-                (full_cmd, process.returncode, stdout, stderr))
+  debug_text = ('Ran %s pid=%d. Got return code (%s).\nSTDOUT: %s\nSTDERR: %s' %
+                (full_cmd, process.pid, process.returncode, stdout, stderr))
   if force_info_log or (process.returncode and not suppress_warning):
     logging.info(debug_text)
   else:

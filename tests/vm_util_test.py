@@ -138,6 +138,7 @@ class IssueCommandTestCase(unittest.TestCase):
 
   def testNoTimeout_ExceptionRaised(self):
     with mock.patch('subprocess.Popen', spec=subprocess.Popen) as mock_popen:
+      mock_popen.return_value.pid = 123
       mock_popen.return_value.wait.side_effect = KeyboardInterrupt()
       with self.assertRaises(KeyboardInterrupt):
         vm_util.IssueCommand(['sleep', '2s'], timeout=None)
