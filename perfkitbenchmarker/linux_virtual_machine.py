@@ -212,6 +212,8 @@ class BaseLinuxMixin(virtual_machine.BaseOsMixin):
     if FLAGS.setup_remote_firewall:
       self.SetupRemoteFirewall()
     if self.install_packages:
+      self.RemoteCommand('sudo mkdir -p %s' % linux_packages.INSTALL_DIR)
+      self.RemoteCommand('sudo chmod a+rwxt %s' % linux_packages.INSTALL_DIR)
       if self.is_static:
         self.SnapshotPackages()
       self.SetupPackageManager()

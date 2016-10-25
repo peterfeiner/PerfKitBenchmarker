@@ -185,6 +185,8 @@ def _ParseNetperfOutput(stdout, metadata, benchmark_name,
   Returns:
     A tuple containing (throughput_sample, latency_samples, latency_histogram)
   """
+  logging.info('Parsing netperf stdout:\n%s', stdout)
+
   # Don't modify the metadata dict that was passed in
   metadata = metadata.copy()
 
